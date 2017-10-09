@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+        <groupId>edu.upf.taln.profiling</groupId>
+    	<artifactId>author-profiling-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>author-profilinig-service</artifactId>
+    <packaging>war</packaging>
+    
+    <name>Author profiling service</name>
+    <description>Author profiling service</description>
+    
+	<dependencies>
+	
+		<dependency>
+            <groupId>edu.upf.taln.web.commons</groupId>
+            <artifactId>web-commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+       
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>author-profiling-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+	
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			 <type>jar</type>
+            <scope>provided</scope>
+		</dependency>
+	
+		<!-- Jersey dependencies -->
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+            <type>jar</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+		</dependency>
+
+		<!-- Spring dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>4.3.3.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-coyote</artifactId>
+			<version>7.0.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Our repository utils dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>5.3.1</version>
+		</dependency>
+
+		<!-- Our Views -->
+		<dependency>
+			<groupId>edu.upf.taln.commons</groupId>
+			<artifactId>views</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+        
+	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<server>local_tomcat</server>
+							<url>http://localhost:8080/manager/text</url>
+							<path>/${project.artifactId}</path>
+						</configuration>
+					</plugin>
+					<plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${version.mvn.war.plugin}</version>
+                        <configuration>
+                            <webXml>${project.basedir}/src/main/resources/local/WEB-INF/web.xml</webXml>
+                        </configuration>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
+	
+		<profile>
+			<id>development</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<server>abstractive_tomcat</server>
+							<url>http://ms-abstractive.s.upf.edu:8080/manager/text</url>
+							<path>/dev/${project.artifactId}</path>
+						</configuration>
+					</plugin>
+					<plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${version.mvn.war.plugin}</version>
+                        <configuration>
+                            <webXml>${project.basedir}/src/main/resources/development/WEB-INF/web.xml</webXml>
+                        </configuration>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>production</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<configuration>
+							<server>kristina_tomcat</server>
+							<url>http://kristina-taln.s.upf.edu:8080/manager/text</url>
+							<path>/prod/${project.artifactId}</path>
+						</configuration>
+					</plugin>
+					   <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>${version.mvn.war.plugin}</version>
+                        <configuration>
+                            <webXml>${project.basedir}/src/main/resources/production/WEB-INF/web.xml</webXml>
+                        </configuration>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
