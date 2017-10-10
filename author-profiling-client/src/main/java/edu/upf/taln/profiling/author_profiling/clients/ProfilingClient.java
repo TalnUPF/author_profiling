@@ -21,36 +21,39 @@ public class ProfilingClient {
 
 	private final WebTarget target;
 
-	public ProfilingClient(String serviceUrl) {
-		Client client = ClientBuilder.newClient();
-		target = client.target(serviceUrl);
+	public ProfilingClient(String serviceUrl) 
+        {
+            Client client = ClientBuilder.newClient();
+            target = client.target(serviceUrl);
 	}
 	
-	public ProfilingOutput analyze(ProfilingInput input) throws ProfilingException {
+	public ProfilingOutput predict(ProfilingInput input) throws ProfilingException 
+        {
         
-		WebTarget methodTarget = target.path("analyze");
-		
-        Response response = methodTarget
-				                .request(MediaType.APPLICATION_JSON_TYPE)
-				                .post(Entity.entity(input, MediaType.APPLICATION_FORM_URLENCODED));
+            WebTarget methodTarget = target.path("predict");
+            Response response = methodTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
         
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            ProfilingOutput result = response.readEntity(new GenericType<ProfilingOutput>() {});
-    		return result;
-            
-        } else if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
-            logger.error("Status: " + response.getStatus());
-            
-            ProfilingException lse = response.readEntity(ProfilingException.class);
-            logger.error(lse.getMessage());
-            
-            throw lse;
-            
-        } else {
-            logger.error("Status: " + response.getStatus());
-            logger.error(response.readEntity(String.class));
-            
-            throw new ProfilingException("Server error!\nStatus: " + response.getStatus());
-        }
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) 
+            {
+                ProfilingOutput result = response.readEntity(new GenericType<ProfilingOutput>() {});
+                return result;
+
+            } 
+            else if (response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) 
+            {
+                logger.error("Status: " + response.getStatus());
+                ProfilingException lse = response.readEntity(ProfilingException.class);
+                logger.error(lse.getMessage());
+
+                throw lse;
+
+            }             
+            else 
+            {
+                logger.error("Status: " + response.getStatus());
+                logger.error(response.readEntity(String.class));
+
+                throw new ProfilingException("Server error!\nStatus: " + response.getStatus());
+            }
 	}
 }
