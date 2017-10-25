@@ -18,7 +18,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.upf.taln.demo.base.pojos.views.input.FormData;
 import edu.upf.taln.demo.base.pojos.views.output.OutputViewerData;
-import edu.upf.taln.profiling.author_profiling.clients.ExampleClient;
+import edu.upf.taln.parser.transition.client.TransitionParserClient;
+import edu.upf.taln.parser.transition.parsing.ParsingData;
+import edu.upf.taln.parser.transition.parsing.ParsingInput;
+import edu.upf.taln.parser.transition.parsing.ParsingMetadata;
+import edu.upf.taln.parser.transition.parsing.ParsingOutput;
+import edu.upf.taln.profiling.author_profiling.clients.ProfilingClient;
 import edu.upf.taln.profiling.author_profiling.commons.pojos.input.ProfilingInput;
 import edu.upf.taln.profiling.author_profiling.commons.pojos.output.ProfilingOutput;
 import edu.upf.taln.profiling.author_profiling.demo.utils.ProfilingOutputViewerFactory;
@@ -36,6 +41,9 @@ public class ProfilingController {
 	
 	@Value("${profilingUrl}")
 	private String serviceUrl;
+	
+	@Value("${transitionUrl}")
+	private String transitionUrl;
 	
     @Autowired
 	ProfilingValidator profilingValidator;
@@ -114,8 +122,8 @@ public class ProfilingController {
 		List<OutputViewerData> listOutputViewerData = new ArrayList<>(); 
 		
 		//We fill the view with the response data
-		if(result.getData() != null){
-            OutputViewerData viewData = ProfilingOutputViewerFactory.generateProfilingView(result.getData().getOriginal(), result.getData().getTranslation(), result.getData());
+		if(result != null){
+            OutputViewerData viewData = ProfilingOutputViewerFactory.generateProfilingView(result);
 			listOutputViewerData.add(viewData);
 		}
 		return listOutputViewerData;
@@ -151,9 +159,25 @@ public class ProfilingController {
 		}else{
 			try {
 			
-				ExampleClient client = new ExampleClient(serviceUrl);
-					
-				ProfilingOutput mtResult = client.analyze(data.getText());
+				ParsingInput inputTrans = new ParsingInput();
+	            ParsingMetadata metadata= new ParsingMetadata();
+	        	metadata.setLanguage("en");
+	        	metadata.setDoSentenceSplitting(true);
+	        	inputTrans.setMetadata(metadata);
+	        	ParsingData pData = new ParsingData();
+	        	pData.setText(data.getText());
+	        	inputTrans.setData(pData);
+	        	
+				TransitionParserClient clientTrans = new TransitionParserClient(transitionUrl);
+		        ParsingOutput parsedConll = clientTrans.parse(inputTrans);
+				
+				
+				ProfilingInput inputProf = new ProfilingInput();
+				inputProf.setText(data.getText());
+				inputProf.setConll(parsedConll.getOutput());
+				
+				ProfilingClient clientProf = new ProfilingClient(serviceUrl);
+				ProfilingOutput mtResult = clientProf.predict(inputProf);
 				
 	            List<OutputViewerData> layers = getOutputViewerData(mtResult);
 	            			

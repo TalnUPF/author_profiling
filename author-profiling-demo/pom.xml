@@ -30,15 +30,15 @@
         </dependency>
         
         <dependency>
-            <groupId>edu.upf.taln.web.commons</groupId>
-            <artifactId>web-commons</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>edu.upf.taln.demo.base</groupId>
+            <artifactId>demo-base</artifactId>
+            <version>0.0.2</version>
         </dependency>
         
         <dependency>
-            <groupId>edu.upf.taln.demo.base</groupId>
-            <artifactId>demo-base</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+        	<groupId>edu.upf.taln.parser</groupId>
+        	<artifactId>transition-client</artifactId>
+        	<version>0.0.1-SNAPSHOT</version>
         </dependency>
           
          <dependency>

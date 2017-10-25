@@ -9,7 +9,11 @@
 
 	<context-param>
 		<param-name>profilingUrl</param-name>
-		<param-value>http://localhost:8080</param-value>
+		<param-value>http://10.80.28.153:5000</param-value>
+	</context-param>
+	<context-param>
+		<param-name>transitionUrl</param-name>
+		<param-value>http://services-taln.s.upf.edu:8080/prod</param-value>
 	</context-param>
 
   	<filter>
