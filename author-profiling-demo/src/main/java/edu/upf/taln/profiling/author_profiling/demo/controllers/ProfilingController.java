@@ -89,6 +89,13 @@ public class ProfilingController {
 		text.setMandatory(true);
 		formData.addComponent(text);
 		
+		formData.setTopText("<h1>UPF This is our title</h1><img src=\"\"></img>");
+		formData.setBottomText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
+				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
+				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
+				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
+				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+		
 		model.addAttribute("form", formData);
 	}
 	
@@ -123,8 +130,12 @@ public class ProfilingController {
 		
 		//We fill the view with the response data
 		if(result != null){
-            OutputViewerData viewData = ProfilingOutputViewerFactory.generateProfilingView(result);
-			listOutputViewerData.add(viewData);
+			OutputViewerData ouput = ProfilingOutputViewerFactory.generateProfilingViewPredictions(result.getPredictions());
+			listOutputViewerData.add(ouput);
+            OutputViewerData syntacticTree = ProfilingOutputViewerFactory.generateProfilingView(result.getText(), result.getConll());
+			listOutputViewerData.add(syntacticTree);
+			OutputViewerData features = ProfilingOutputViewerFactory.generateProfilingViewFeatures(result.getFeatures());
+			listOutputViewerData.add(features);
 		}
 		return listOutputViewerData;
 	}
