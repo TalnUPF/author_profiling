@@ -32,7 +32,7 @@
         <dependency>
             <groupId>edu.upf.taln.demo.base</groupId>
             <artifactId>demo-base</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
         
         <dependency>
