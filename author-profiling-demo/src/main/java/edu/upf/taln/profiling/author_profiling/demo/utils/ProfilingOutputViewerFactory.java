@@ -109,14 +109,14 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 		return view;
 	}
 	
-	public static OutputViewerData generateProfilingView(String text, String conll) {
+	public static OutputViewerData generateProfilingView(String json) {
 		OutputViewerData view = new OutputViewerData();
 		view.setLevelName("Syntactic Trees");
 		view.setCollapsed(true);
 	
 		String error = null;
 		try{
-			view.addComponent(getBratComponent(text, conll, LevelsMapping.PARSED_TEXT));
+			view.addComponent(getBratComponent(json));
 		}catch(Exception e){
 			error = e.getMessage();
 		}

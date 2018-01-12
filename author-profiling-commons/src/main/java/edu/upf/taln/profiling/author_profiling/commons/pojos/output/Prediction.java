@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author joan
+ * @author joan Soler
  */
 public class Prediction 
 {

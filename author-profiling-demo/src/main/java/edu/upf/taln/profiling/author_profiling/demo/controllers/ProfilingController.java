@@ -1,8 +1,14 @@
 package edu.upf.taln.profiling.author_profiling.demo.controllers;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+//import org.apache.catalina.Pipeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,11 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import edu.upf.taln.demo.base.pojos.views.input.FormData;
 import edu.upf.taln.demo.base.pojos.views.output.OutputViewerData;
-import edu.upf.taln.parser.transition.client.TransitionParserClient;
-import edu.upf.taln.parser.transition.parsing.ParsingData;
-import edu.upf.taln.parser.transition.parsing.ParsingInput;
-import edu.upf.taln.parser.transition.parsing.ParsingMetadata;
-import edu.upf.taln.parser.transition.parsing.ParsingOutput;
 import edu.upf.taln.profiling.author_profiling.clients.ProfilingClient;
 import edu.upf.taln.profiling.author_profiling.commons.pojos.input.ProfilingInput;
 import edu.upf.taln.profiling.author_profiling.commons.pojos.output.ProfilingOutput;
@@ -30,9 +31,30 @@ import edu.upf.taln.profiling.author_profiling.demo.utils.ProfilingOutputViewerF
 import edu.upf.taln.profiling.author_profiling.demo.validators.ProfilingValidator;
 import edu.upf.taln.demo.base.pojos.views.input.TextAreaData;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
+
+
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngine;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+
+import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
+
+import de.tudarmstadt.ukp.dkpro.core.api.metadata.type.DocumentMetaData;
+import de.tudarmstadt.ukp.dkpro.core.io.brat.BratWriter;
+import de.tudarmstadt.ukp.dkpro.core.io.conll.Conll2009Writer;
+import de.tudarmstadt.ukp.dkpro.core.matetools.MateLemmatizer;
+import de.tudarmstadt.ukp.dkpro.core.matetools.MateParser;
+import de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpPosTagger;
+import de.tudarmstadt.ukp.dkpro.core.opennlp.OpenNlpSegmenter;
+import de.tudarmstadt.ukp.dkpro.core.stanfordnlp.StanfordNamedEntityRecognizer;
+
+
 
 @Component
 @Controller
@@ -47,13 +69,67 @@ public class ProfilingController {
 	
     @Autowired
 	ProfilingValidator profilingValidator;
-
+    AnalysisEngine pipeline;
+    AnalysisEngine pipelineBratOut;
+    AnalysisEngine pipelineConllOut;
+    
 	//Set a form validator
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(profilingValidator);
 	}
+	
+	@PostConstruct
+	public void init() throws ResourceInitializationException {
+	    
+	  // Bratt mapings  
+	    final String[] spanTypes = { 
+	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
+	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:pos|PosValue",
+	            "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" // it takes the 
+
+	      };
+
+	          Set<String> relationTypes= new HashSet<>();
+	           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
+	           
+	       final String[] typeMappings= {
+	                      "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.(\\w+) -> $1",
+	                      "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_(\\w+) -> $1",
+	                      "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.(\\w+) -> $1",
+	                      "de.tudarmstadt.ukp.dkpro.core.api.ner.type.(\\w+) -> $1",
+	                      "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.(\\w+) -> $1."
+	              };
+	   // create the uima Pipeline
+	   pipeline= createEngine(
+                createEngineDescription(OpenNlpSegmenter.class),
+                createEngineDescription(OpenNlpPosTagger.class), 
+                createEngineDescription(MateLemmatizer.class,
+                        MateLemmatizer.PARAM_MODEL_LOCATION, new File("/home/joan/Desktop/TALN/UIMA/", "CoNLL2009-ST-English-ALL.anna-3.3.lemmatizer.model")),
+                createEngineDescription(MateParser.class,
+                            MateParser.PARAM_LANGUAGE,"en"),
+                createEngineDescription(StanfordNamedEntityRecognizer.class));
+ 
+    pipelineBratOut = createEngine(
+                createEngineDescription(BratWriter.class,
+                        BratWriter.PARAM_TARGET_LOCATION,null, // null for extract to string
+                        BratWriter.PARAM_FILENAME_EXTENSION,".json",
+                        BratWriter.PARAM_OVERWRITE,true,
+                        BratWriter.PARAM_ENABLE_TYPE_MAPPINGS,true,
+                        BratWriter.PARAM_SHORT_ATTRIBUTE_NAMES,false,
+                        BratWriter.PARAM_STRIP_EXTENSION,true,
+                        BratWriter.PARAM_TYPE_MAPPINGS,typeMappings,
+                        BratWriter.PARAM_TEXT_ANNOTATION_TYPES,spanTypes,
+                        BratWriter.PARAM_RELATION_TYPES,relationTypes,
+                        BratWriter.PARAM_WRITE_RELATION_ATTRIBUTES,false
+                        ) );
     
+    pipelineConllOut = createEngine(
+            createEngineDescription(Conll2009Writer.class,
+                    Conll2009Writer.PARAM_TARGET_LOCATION,null // null for extract to string
+                    ) );
+
+	}
 	//===============================================================================
 	//                             VIEWS GENERATION
 	//===============================================================================
@@ -89,12 +165,11 @@ public class ProfilingController {
 		text.setMandatory(true);
 		formData.addComponent(text);
 		
-		formData.setTopText("<h1>UPF This is our title</h1><img src=\"\"></img>");
-		formData.setBottomText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
-				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
-				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
-				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + 
-				"				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+		formData.setTopText("TALN Nautral Language Processing Group");
+		formData.setBottomText("This demo takes as input a fragment of English text and generates as ouput a guess of the author with a more similar style."
+				+ " The text is processed using different NLP techniques."
+				+ " The result of this processing is a set of features that are used to classify the text. "
+				+ " The system manages a list of 20 authors, and indicates witch of the authors has a style more simlar to the one of the given text ");
 		
 		model.addAttribute("form", formData);
 	}
@@ -132,7 +207,7 @@ public class ProfilingController {
 		if(result != null){
 			OutputViewerData ouput = ProfilingOutputViewerFactory.generateProfilingViewPredictions(result.getPredictions());
 			listOutputViewerData.add(ouput);
-            OutputViewerData syntacticTree = ProfilingOutputViewerFactory.generateProfilingView(result.getText(), result.getConll());
+            OutputViewerData syntacticTree = ProfilingOutputViewerFactory.generateProfilingView( result.getBrat());
 			listOutputViewerData.add(syntacticTree);
 			OutputViewerData features = ProfilingOutputViewerFactory.generateProfilingViewFeatures(result.getFeatures());
 			listOutputViewerData.add(features);
@@ -161,7 +236,6 @@ public class ProfilingController {
 	}
 	
 	@RequestMapping(value = "/parse", method = RequestMethod.POST)
-
 	public String parse(@ModelAttribute("formModel") @Validated ProfilingInput data, BindingResult result, ModelMap model, HttpServletRequest req) {
 
 		if (result.hasErrors()) {
@@ -169,27 +243,37 @@ public class ProfilingController {
 			return "baseInput";
 		}else{
 			try {
-			
-				ParsingInput inputTrans = new ParsingInput();
-	            ParsingMetadata metadata= new ParsingMetadata();
-	        	metadata.setLanguage("en");
-	        	metadata.setDoSentenceSplitting(true);
-	        	inputTrans.setMetadata(metadata);
-	        	ParsingData pData = new ParsingData();
-	        	pData.setText(data.getText());
-	        	inputTrans.setData(pData);
-	        	
-				TransitionParserClient clientTrans = new TransitionParserClient(transitionUrl);
-		        ParsingOutput parsedConll = clientTrans.parse(inputTrans);
+				data.getText();
+			    JCas jcas = JCasFactory.createJCas();
+		        jcas.setDocumentText(data.getText());
+		        jcas.setDocumentLanguage("en"); 
+		        DocumentMetaData docData=new DocumentMetaData(jcas);
+		        docData.setDocumentTitle("prova");
+		        docData.setDocumentId("prova");
+		        docData.addToIndexes();
+		        pipeline.process(jcas);
+		        
+		        // extract BRAT
+		        PrintStream old_out = System.out;
+		        ByteArrayOutputStream pipeOut = new ByteArrayOutputStream();
+                pipelineBratOut.process(jcas);
+	            System.setOut(old_out);
+	            String brat = new String(pipeOut.toByteArray());
+	            pipeOut.close();
+                pipeOut = new ByteArrayOutputStream();
+                pipelineConllOut.process(jcas);
+                System.setOut(old_out);
+                String parsedConll = new String(pipeOut.toByteArray());
+
 				
 				
 				ProfilingInput inputProf = new ProfilingInput();
 				inputProf.setText(data.getText());
-				inputProf.setConll(parsedConll.getOutput());
+				inputProf.setConll(parsedConll);
 				
 				ProfilingClient clientProf = new ProfilingClient(serviceUrl);
 				ProfilingOutput mtResult = clientProf.predict(inputProf);
-				
+				mtResult.setBrat(brat);
 	            List<OutputViewerData> layers = getOutputViewerData(mtResult);
 	            			
 	            generateOutputView(model, req);

@@ -7,7 +7,7 @@ package edu.upf.taln.profiling.author_profiling.commons.pojos.output;
 
 /**
  *
- * @author joan
+ * @author joan Soler
  */
 public class Feature 
 {

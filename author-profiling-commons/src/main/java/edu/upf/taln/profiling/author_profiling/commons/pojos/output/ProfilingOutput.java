@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProfilingOutput {
     private String text;
-    private String conll;
+    private String brat;
     private List<Prediction> predictions;
     private List<Feature> features;
 
@@ -19,12 +19,12 @@ public class ProfilingOutput {
         this.text = text;
     }
 
-    public String getConll() {
-        return conll;
+    public String getBrat() {
+        return brat;
     }
 
-    public void setConll(String conll) {
-        this.conll = conll;
+    public void setBrat(String brat) {
+        this.brat = brat;
     }
 
     public List<Prediction> getPredictions() {
