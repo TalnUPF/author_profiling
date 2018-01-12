@@ -101,14 +101,14 @@ public class ProfilingController {
 	                      "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.(\\w+) -> $1."
 	              };
 	   // create the uima Pipeline
-	   pipeline= createEngine(
+	   pipeline= createEngine(createEngineDescription(
                 createEngineDescription(OpenNlpSegmenter.class),
                 createEngineDescription(OpenNlpPosTagger.class), 
                 createEngineDescription(MateLemmatizer.class,
                         MateLemmatizer.PARAM_MODEL_LOCATION, new File("/home/joan/Desktop/TALN/UIMA/", "CoNLL2009-ST-English-ALL.anna-3.3.lemmatizer.model")),
                 createEngineDescription(MateParser.class,
                             MateParser.PARAM_LANGUAGE,"en"),
-                createEngineDescription(StanfordNamedEntityRecognizer.class));
+                createEngineDescription(StanfordNamedEntityRecognizer.class)));
  
     pipelineBratOut = createEngine(
                 createEngineDescription(BratWriter.class,
@@ -256,11 +256,13 @@ public class ProfilingController {
 		        // extract BRAT
 		        PrintStream old_out = System.out;
 		        ByteArrayOutputStream pipeOut = new ByteArrayOutputStream();
+		        System.setOut(new PrintStream(pipeOut));
                 pipelineBratOut.process(jcas);
 	            System.setOut(old_out);
 	            String brat = new String(pipeOut.toByteArray());
 	            pipeOut.close();
                 pipeOut = new ByteArrayOutputStream();
+                System.setOut(new PrintStream(pipeOut));                
                 pipelineConllOut.process(jcas);
                 System.setOut(old_out);
                 String parsedConll = new String(pipeOut.toByteArray());
