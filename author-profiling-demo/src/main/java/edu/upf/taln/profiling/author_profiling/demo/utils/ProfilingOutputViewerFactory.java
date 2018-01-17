@@ -13,8 +13,16 @@ import edu.upf.taln.profiling.author_profiling.commons.pojos.output.Feature;
 import edu.upf.taln.profiling.author_profiling.commons.pojos.output.Prediction;
 
 public class ProfilingOutputViewerFactory extends OutputViewerFactory{
-	
-	public static OutputViewerData generateProfilingViewPredictions(List<Prediction> predictions) {
+
+    private static String splitCamelCaseString(String s){
+        String result = "";   
+        for (String w : s.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])")) {
+            result+=w+" ";
+        }    
+        return result;
+    }
+
+    public static OutputViewerData generateProfilingViewPredictions(List<Prediction> predictions) {
 		OutputViewerData view = new OutputViewerData();
 		view.setLevelName("Output");
 		view.setCollapsed(false);
@@ -26,18 +34,18 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 			for(Prediction prediction: predictions){
 				String title = "";
 				if(prediction.getModelName().equals("LiteraryMerged_book_etreeCLF.pkl")){
-					title = "Book Resemblance Prediction (eTree)";
-				}else if(prediction.getModelName().equals("LiteraryMerged_author_svmCLF.pkl")){
+					title = "Book Resemblance Prediction";// (eTree)
+/*				} else if(prediction.getModelName().equals("LiteraryMerged_author_svmCLF.pkl")){
 					title = "Author Resemblance Prediction (SVM)";
 				}else if(prediction.getModelName().equals("LiteraryMerged_book_svmCLF.pkl")){
-					title = "Book Resemblance Prediction (SVM)";
-				}else if(prediction.getModelName().equals("LiteraryMerged_author_etreeCLF.pkl")){
-					title = "Author Resemblance Prediction (eTree)";
+					title = "Book Resemblance Prediction (SVM)"; 
+*/				}else if(prediction.getModelName().equals("LiteraryMerged_author_etreeCLF.pkl")){
+					title = "Author Resemblance Prediction";// (eTree)
 				}else{
 					continue;
 				}
 				titles.add(title);
-				results.add(prediction.getPrediction());
+				results.add(splitCamelCaseString(prediction.getPrediction()));
 			}
 			view.addComponent(getMultiTitleResultComponent(titles, results, "checkboxesPadding"));
 		}catch(Exception e){
@@ -74,7 +82,8 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 			
 			List<TableCell> headerCols = new ArrayList<TableCell>();
 			headerCols.add(new TableCell("Type"));
-			headerCols.add(new TableCell("Name"));
+// Joan Codina remove feature name
+//			headerCols.add(new TableCell("Name"));
 			headerCols.add(new TableCell("Value"));
 			tableData.add(headerCols);
 			
@@ -82,15 +91,16 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 			for(Feature feature: features){
 				List<TableCell> cols = new ArrayList<TableCell>();
 				
-				TableCell type = new TableCell(feature.getFeatureType());
+				TableCell type = new TableCell(splitCamelCaseString(feature.getFeatureType()));
 				Integer val = typeNumber.get(feature.getFeatureType());
 				type.setRowspan(val);
 				
 				if(prev == null || !prev.equals(feature.getFeatureType())){
-					cols.add(type);
+				    cols.add(type);
+					
 				}
-				
-				cols.add(new TableCell(feature.getFeatureName()));
+// Joan Codina, remove feature name				
+//				cols.add(new TableCell(feature.getFeatureName()));
 				cols.add(new TableCell(String.valueOf(feature.getValue())));
 				tableData.add(cols);
 				

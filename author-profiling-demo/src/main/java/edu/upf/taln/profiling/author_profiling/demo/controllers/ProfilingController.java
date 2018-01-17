@@ -85,13 +85,17 @@ public class ProfilingController {
 	  // Bratt mapings  
 	    final String[] spanTypes = { 
 	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
-	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:pos|PosValue",
+	            "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS:coarseValue",
 	            "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" // it takes the 
 
 	      };
-
-	          Set<String> relationTypes= new HashSet<>();
+	    
+	      Set<String> relationTypes= new HashSet<>();
 	           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
+	      
+	      Set<String> excludedTypes = new HashSet<>(); 
+	           excludedTypes.add("de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_PUNCT");
+	           excludedTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.PUNCT");
 	           
 	       final String[] typeMappings= {
 	                      "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.(\\w+) -> $1",
@@ -105,7 +109,8 @@ public class ProfilingController {
                 createEngineDescription(OpenNlpSegmenter.class),
                 createEngineDescription(OpenNlpPosTagger.class), 
                 createEngineDescription(MateLemmatizer.class,
-                        MateLemmatizer.PARAM_MODEL_LOCATION, new File("/home/joan/Desktop/TALN/UIMA/", "CoNLL2009-ST-English-ALL.anna-3.3.lemmatizer.model")),
+                        //this is the location where the docker copies it!
+                        MateLemmatizer.PARAM_MODEL_LOCATION, new File("/home/", "CoNLL2009-ST-English-ALL.anna-3.3.lemmatizer.model")),
                 createEngineDescription(MateParser.class,
                             MateParser.PARAM_LANGUAGE,"en"),
                 createEngineDescription(StanfordNamedEntityRecognizer.class)));
@@ -117,6 +122,7 @@ public class ProfilingController {
                         BratWriter.PARAM_OVERWRITE,true,
                         BratWriter.PARAM_ENABLE_TYPE_MAPPINGS,true,
                         BratWriter.PARAM_SHORT_ATTRIBUTE_NAMES,false,
+                        BratWriter.PARAM_EXCLUDE_TYPES,excludedTypes,
                         BratWriter.PARAM_STRIP_EXTENSION,true,
                         BratWriter.PARAM_TYPE_MAPPINGS,typeMappings,
                         BratWriter.PARAM_TEXT_ANNOTATION_TYPES,spanTypes,
@@ -283,6 +289,7 @@ public class ProfilingController {
 	            return "baseOutput";
 	
 			} catch(Exception e) {
+			    e.printStackTrace();
 				generateInputView(model, req);
 				model.addAttribute("error", e.getMessage());
 				return "baseInput";
