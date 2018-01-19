@@ -191,7 +191,7 @@ public class ProfilingController {
 		model.addAttribute("title", "Result Visualizer");
 		
 		List<String> jsHeaders = new ArrayList<>();
-		jsHeaders.add("http://weaver.nlplab.org/~brat/demo/v1.3/client/lib/head.load.min.js");
+		jsHeaders.add("../resources/core/js/head.load.min.js");
 		model.addAttribute("jsHeaders", jsHeaders);
 		
 		List<String> cssHeaders = new ArrayList<>();
