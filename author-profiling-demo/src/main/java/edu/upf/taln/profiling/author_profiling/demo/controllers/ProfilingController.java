@@ -171,11 +171,16 @@ public class ProfilingController {
 		text.setMandatory(true);
 		formData.addComponent(text);
 		
-		formData.setTopText("TALN Nautral Language Processing Group");
+		formData.setTopText("TALN Natural Language Processing Group");
 		formData.setBottomText("This demo takes as input a fragment of English text and generates as ouput a guess of the author with a more similar style."
-				+ " The text is processed using different NLP techniques."
-				+ " The result of this processing is a set of features that are used to classify the text. "
-				+ " The system manages a list of 20 authors, and indicates witch of the authors has a style more simlar to the one of the given text ");
+		        +  "The system manages a list of 32 authors and 106 books, analizes the text and indicates witch of the authors and books has a style more simlar to the one of the given text <br> "
+				+ " To perform the gess, the text is processed using different NLP techniques (Some of the results of this processing can be observed in the otuput)."
+				+ " From the NLP processing a set of numeric features are computed using different data: some features are based on words, lexical or syntanctic information. The features vector is "
+				+ "introduced to claddifier trained using machine learning thechniques.<br>"
+				+ " The demo shows the classification result (the author and book with a style more similar to the introduced text, the features vector and some of the linguistic processing, "
+				+ "in particular: lemma of the word, part of speech, dependecies and Named Entities "
+				+ " (Persons, Organizations, Places)<br>"
+				+ " The system could be trained to classify texts in other cathegories like gender of the writer, age or even target public. ");
 		
 		model.addAttribute("form", formData);
 	}

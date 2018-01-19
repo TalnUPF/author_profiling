@@ -9,7 +9,7 @@
 
 	<context-param>
 		<param-name>profilingUrl</param-name>
-		<param-value>http://10.80.28.153:5000</param-value>
+		<param-value>http://profiling-books:5000</param-value>
 	</context-param>
 	<context-param>
 		<param-name>transitionUrl</param-name>

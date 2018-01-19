@@ -1,0 +1,14 @@
+version: '2'
+services:
+  profiling-books:
+    container_name: profiling-books
+    build: /var/data/dockers/profiling
+    image: profiling-books
+    ports:
+    - "5002:5000"
+  profiling-books-demo:
+    build: .
+    image: profiling-books-demo
+    ports:
+    - "8082:8080"
+
