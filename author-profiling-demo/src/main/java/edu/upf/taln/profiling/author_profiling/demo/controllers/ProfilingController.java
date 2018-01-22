@@ -84,14 +84,14 @@ public class ProfilingController {
 	    
 	  // Bratt mapings  
 	    final String[] spanTypes = { 
-	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
-	            "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS:coarseValue",
+                "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
+	//            "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS:coarseValue",
 	            "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" // it takes the 
 
 	      };
 	    
 	      Set<String> relationTypes= new HashSet<>();
-	           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
+	//           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
 	      
 	      Set<String> excludedTypes = new HashSet<>(); 
 	           excludedTypes.add("de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_PUNCT");
@@ -173,10 +173,10 @@ public class ProfilingController {
 		
 		formData.setTopText("TALN Natural Language Processing Group");
 		formData.setBottomText("This demo takes as input a fragment of English text and generates as ouput a guess of the author with a more similar style."
-		        +  "The system manages a list of 32 authors and 106 books, analizes the text and indicates witch of the authors and books has a style more simlar to the one of the given text <br> "
-				+ " To perform the gess, the text is processed using different NLP techniques (Some of the results of this processing can be observed in the otuput)."
-				+ " From the NLP processing a set of numeric features are computed using different data: some features are based on words, lexical or syntanctic information. The features vector is "
-				+ "introduced to claddifier trained using machine learning thechniques.<br>"
+		        +  "The system manages a list of 32 authors and 106 books, analyzes the text and indicates which of the authors and books has a style more similar to the one of the given text <br> "
+				+ " To perform the guess, the text is processed using different NLP techniques (some of the results of this processing can be observed in the output)."
+				+ " From the NLP processing a set of numeric features are computed using different data: some features are based on words, lexical or syntactic information. The features vector is "
+				+ "introduced to a classifier trained using machine learning techniques.<br>"
 				+ " The demo shows the classification result (the author and book with a style more similar to the introduced text, the features vector and some of the linguistic processing, "
 				+ "in particular: lemma of the word, part of speech, dependecies and Named Entities "
 				+ " (Persons, Organizations, Places)<br>"
