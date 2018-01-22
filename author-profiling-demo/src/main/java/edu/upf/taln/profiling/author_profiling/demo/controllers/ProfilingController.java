@@ -84,7 +84,8 @@ public class ProfilingController {
 	    
 	  // Bratt mapings  
 	    final String[] spanTypes = { 
-                "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
+    //            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:lemma|value",
+	            "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token:pos|PosValue",
 	//            "de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS:coarseValue",
 	            "de.tudarmstadt.ukp.dkpro.core.api.ner.type.NamedEntity" // it takes the 
 
