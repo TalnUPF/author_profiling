@@ -92,7 +92,7 @@ public class ProfilingController {
 	      };
 	    
 	      Set<String> relationTypes= new HashSet<>();
-	//           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
+	           relationTypes.add("de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency:Governor:Dependent:DependencyType");
 	      
 	      Set<String> excludedTypes = new HashSet<>(); 
 	           excludedTypes.add("de.tudarmstadt.ukp.dkpro.core.api.lexmorph.type.pos.POS_PUNCT");
