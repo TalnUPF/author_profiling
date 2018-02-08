@@ -3,7 +3,8 @@ FROM tomcat:alpine
 MAINTAINER Joan Codina <joan.codina@upf.edu>
 #This docker is thought to be combined with another docker that has the profiling-service
 #The other docker should have the name profiling-books and expose its services in port 5000
-#Both dockers must share the same doker net
+#Both dockers must share the same docker net
+#check the docker compose for further instructions
 
 
 COPY target/author-profiling-demo-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/author-profiling-demo.war
