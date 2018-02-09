@@ -42,7 +42,7 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 				}else if(prediction.getModelName().equals("LiteraryMerged_author_etreeCLF.pkl")){
 					title = "Author Resemblance Prediction";// (eTree)
 				}else{
-					continue;
+				    title = prediction.getModelName(); //continue;
 				}
 				titles.add(title);
 				results.add(splitCamelCaseString(prediction.getPrediction()));
