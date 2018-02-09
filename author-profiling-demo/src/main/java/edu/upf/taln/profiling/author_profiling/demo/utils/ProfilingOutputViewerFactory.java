@@ -35,14 +35,15 @@ public class ProfilingOutputViewerFactory extends OutputViewerFactory{
 				String title = "";
 				if(prediction.getModelName().equals("LiteraryMerged_book_etreeCLF.pkl")){
 					title = "Book Resemblance Prediction";// (eTree)
-				} else if(prediction.getModelName().equals("LiteraryMerged_author_svmCLF.pkl")){
+/*				} else if(prediction.getModelName().equals("LiteraryMerged_author_svmCLF.pkl")){
 					title = "Author Resemblance Prediction (SVM)";
 				}else if(prediction.getModelName().equals("LiteraryMerged_book_svmCLF.pkl")){
 					title = "Book Resemblance Prediction (SVM)"; 
-				}else if(prediction.getModelName().equals("LiteraryMerged_author_etreeCLF.pkl")){
+*/				}else if(prediction.getModelName().equals("LiteraryMerged_author_etreeCLF.pkl")){
 					title = "Author Resemblance Prediction";// (eTree)
 				}else{
-				    title = prediction.getModelName(); //continue;
+				    //title = prediction.getModelName(); 
+				    continue;
 				}
 				titles.add(title);
 				results.add(splitCamelCaseString(prediction.getPrediction()));
